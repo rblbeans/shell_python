@@ -1,0 +1,20 @@
+rm -f /etc/yum.repos.d/cobbler-config.repo
+yum install -y cloud-utils-growpart
+umount /data
+fdisk /dev/sda
+d
+4
+w
+fdisk /dev/sda
+n
+p
+244320257
+w
+partprobe /dev/sda
+mkfs.ext4 /dev/sda4
+blkid|grep "/dev/sda4"|awk '{print $2}'|awk -F\" '{print $2}'
+sed -i 's#UUID=.* /data#UUID=66f03b96-a9e1-4aaf-8e9c-91ac72a836b1 /data#' /etc/fstab
+growpart /dev/sda 3
+resize2fs /dev/sda3
+systemctl daemon-reload
+mount /dev/sda4 /data
